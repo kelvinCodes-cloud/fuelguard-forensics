@@ -1,4 +1,28 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fleet Jamming Detection</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
-<body><nav><div class="brand">FuelGuard Forensics</div>{% if session.get('user') %}<a href="/">Dashboard</a><a href="/vehicles">Vehicles</a><a href="/incidents">Incidents</a><a href="/scan">Run Scan</a><a href="/logout">Logout</a>{% else %}<a href="/login">Login</a>{% endif %}</nav><main>{% block content %}{% endblock %}</main></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FuelGuard Forensics</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQv1jgwXgQGqGUIsmqycdj4kE0GTi5s=" crossorigin="">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <aside class="side-nav">
+    <div class="brand" title="FuelGuard Forensics"><span>🚚</span><strong>FG</strong></div>
+    {% if session.get('user') %}
+      <a href="/" title="Dashboard"><span>📊</span><em>Dashboard</em></a>
+      <a href="/tracking" title="Live Tracking"><span>🗺️</span><em>Tracking</em></a>
+      <a href="/vehicles" title="Add / Manage Trucks"><span>➕</span><em>Trucks</em></a>
+      <a href="/incidents" title="Incidents"><span>🚨</span><em>Incidents</em></a>
+      <a href="/scan" title="Run Scan"><span>🔍</span><em>Scan</em></a>
+      <a href="/logout" title="Logout"><span>↩️</span><em>Logout</em></a>
+    {% else %}
+      <a href="/login" title="Login"><span>🔐</span><em>Login</em></a>
+    {% endif %}
+  </aside>
+  <main class="screen-panel">{% block content %}{% endblock %}</main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

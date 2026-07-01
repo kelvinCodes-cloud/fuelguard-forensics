@@ -1,0 +1,44 @@
+{% extends 'base.html' %}{% block content %}
+<section class="hero compact-hero"><small>Live Tracking Demo</small><h1>Nairobi → Kisumu Moving Truck</h1><p>Select a truck, press Start Demo, then watch it move, stop, lose signal, and trigger a fuel-theft alert.</p></section>
+
+<section class="tracking-shell">
+  <div class="map-card">
+    <div id="map"></div>
+    <div class="route-demo-overlay">
+      <div class="route-line"></div>
+      <div class="city nairobi">Nairobi</div>
+      <div class="city naivasha">Naivasha</div>
+      <div class="city nakuru">Nakuru</div>
+      <div class="city kericho">Kericho</div>
+      <div class="city kisumu">Kisumu</div>
+      <div id="demoTruck" class="demo-truck">🚚</div>
+      <div id="dangerZone" class="danger-zone">GSM blackout / fuel loss zone</div>
+    </div>
+  </div>
+  <aside class="telemetry-card">
+    <h2>Truck control</h2>
+    <label>Truck</label>
+    <select id="truckSelect"><option value="KDG 142A">KDG 142A — Demo</option><option value="KDB 502M">KDB 502M — Demo theft event</option></select>
+    <div class="button-row"><button id="startBtn">▶ Start Demo</button><button id="pauseBtn">⏸ Pause</button><button id="resetBtn">↺ Reset</button></div>
+    <dl class="telemetry-grid">
+      <dt>Route</dt><dd id="routeName">Nairobi to Kisumu</dd>
+      <dt>Status</dt><dd id="status">Ready</dd>
+      <dt>Current area</dt><dd id="area">Nairobi CBD</dd>
+      <dt>Speed</dt><dd id="speed">0 km/h</dd>
+      <dt>Fuel</dt><dd id="fuel">220 L</dd>
+      <dt>Signal</dt><dd id="signal">Online</dd>
+      <dt>Stopped time</dt><dd id="stopTime">0 min</dd>
+    </dl>
+    <div id="alertBox" class="alert-box quiet">No alert. Start the demo.</div>
+  </aside>
+</section>
+
+<section class="timeline-card">
+  <h2>Demo story Kelvin can explain</h2>
+  <ol id="eventLog"><li>Truck is loaded in Nairobi and begins the Kisumu delivery route.</li></ol>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='tracking.js') }}"></script>
+{% endblock %}

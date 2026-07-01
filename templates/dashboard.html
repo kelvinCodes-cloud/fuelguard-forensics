@@ -1,6 +1,21 @@
 {% extends 'base.html' %}{% block content %}
-<div class="hero"><small>Fleet Operations Dashboard</small><h1>Live Fleet Monitoring Dashboard</h1><p>Delivery-van monitoring, GSM signal-gap detection, fuel-drop analysis, and forensic incident reporting.</p></div>
-<section class="cards"><div><b>{{ stats.vehicles }}</b><span>Total Trucks</span></div><div><b>{{ stats.online }}</b><span>Online</span></div><div><b>{{ stats.alerts }}</b><span>Open Alerts</span></div><div><b>{{ '%.1f'|format(stats.fuel_loss) }} L</b><span>Suspected Loss</span></div></section>
-<h2>Recent Forensic Alerts</h2>{% include 'incident_table.html' %}
-<h2>Fleet Status</h2><div class="grid">{% for v in vehicles %}<div class="vehicle {{ v.status }}"><strong>{{ v.plate }}</strong><span>{{ v.driver }}</span><em>{{ v.status }}</em></div>{% endfor %}</div>
+<section class="hero compact-hero">
+  <small>Fleet Simulation Dashboard</small>
+  <h1>FuelGuard Live Demo</h1>
+  <p>The middle stays clean. Use the left icons to open tracking, add trucks, view alerts, or export reports.</p>
+</section>
+
+<section class="cards icon-cards">
+  <a class="action-card" href="/tracking"><b>🗺️</b><strong>Track demo truck</strong><span>Animated Nairobi → Kisumu trip</span></a>
+  <a class="action-card" href="/vehicles"><b>➕</b><strong>Add trucks</strong><span>Create demo or future real trucks</span></a>
+  <a class="action-card" href="/incidents"><b>🚨</b><strong>Incidents</strong><span>Stops, signal loss, fuel drops</span></a>
+  <a class="action-card" href="/scan"><b>🔍</b><strong>Run scan</strong><span>Recalculate suspicious events</span></a>
+</section>
+
+<section class="cards stats-strip">
+  <div><b>{{ stats.vehicles }}</b><span>Total Trucks</span></div>
+  <div><b>{{ stats.online }}</b><span>Online</span></div>
+  <div><b>{{ stats.alerts }}</b><span>Open Alerts</span></div>
+  <div><b>{{ '%.1f'|format(stats.fuel_loss) }} L</b><span>Suspected Loss</span></div>
+</section>
 {% endblock %}

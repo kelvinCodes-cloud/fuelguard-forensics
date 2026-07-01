@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, redirect, url_for, Response, send_file, request, session, flash
+from flask import Flask, render_template, g, redirect, url_for, Response, send_file, request, session, flash, jsonify
 from functools import wraps
 import sqlite3, os, csv, io
 from datetime import datetime, timedelta
@@ -132,10 +132,47 @@ def dashboard():
     return render_template('dashboard.html', stats=stats, vehicles=vehicles, incidents=incidents)
 
 
-@app.route('/vehicles')
+@app.route('/vehicles', methods=['GET', 'POST'])
 @login_required
 def vehicles():
-    return render_template('vehicles.html', vehicles=get_db().execute('SELECT * FROM vehicles ORDER BY plate').fetchall())
+    conn = get_db()
+    if request.method == 'POST':
+        plate = request.form.get('plate', '').strip().upper()
+        driver = request.form.get('driver', '').strip()
+        tracker_model = request.form.get('tracker_model', '').strip() or 'Phone GPS Demo'
+        fuel_sensor = request.form.get('fuel_sensor', '').strip() or 'Demo fuel sensor'
+        status = request.form.get('status', 'online').strip().lower()
+        if plate and driver:
+            conn.execute('INSERT OR IGNORE INTO vehicles(plate,driver,tracker_model,fuel_sensor,status) VALUES (?,?,?,?,?)', (plate, driver, tracker_model, fuel_sensor, status))
+            conn.commit()
+        return redirect(url_for('vehicles'))
+    return render_template('vehicles.html', vehicles=conn.execute('SELECT * FROM vehicles ORDER BY plate').fetchall())
+
+
+@app.route('/tracking')
+@login_required
+def tracking():
+    return render_template('tracking.html')
+
+
+@app.route('/api/demo-route')
+@login_required
+def demo_route():
+    return jsonify({
+        'route': 'Nairobi to Kisumu',
+        'points': [
+            {'area': 'Nairobi CBD', 'lat': -1.286389, 'lng': 36.817223, 'speed': 0, 'fuel': 220, 'signal': 'Online', 'status': 'Loading', 'stop': 0, 'message': 'Truck starts in Nairobi.'},
+            {'area': 'Westlands', 'lat': -1.2647, 'lng': 36.8020, 'speed': 32, 'fuel': 219, 'signal': 'Online', 'status': 'Moving', 'stop': 0, 'message': 'Truck leaves Nairobi.'},
+            {'area': 'Limuru escarpment', 'lat': -1.1079, 'lng': 36.6426, 'speed': 58, 'fuel': 216, 'signal': 'Online', 'status': 'Moving', 'stop': 0, 'message': 'Normal movement toward Rift Valley.'},
+            {'area': 'Naivasha stop', 'lat': -0.7167, 'lng': 36.4333, 'speed': 0, 'fuel': 214, 'signal': 'Online', 'status': 'Normal stop', 'stop': 8, 'message': 'Short legal stop. No alert.'},
+            {'area': 'Nakuru', 'lat': -0.3031, 'lng': 36.0800, 'speed': 62, 'fuel': 209, 'signal': 'Online', 'status': 'Moving', 'stop': 0, 'message': 'Truck continues normally.'},
+            {'area': 'Mau Summit blackout', 'lat': -0.1808, 'lng': 35.6814, 'speed': 0, 'fuel': 207, 'signal': 'Lost', 'status': 'Stopped', 'stop': 12, 'message': 'Signal disappears while truck is stopped.'},
+            {'area': 'Mau Summit blackout', 'lat': -0.1808, 'lng': 35.6814, 'speed': 0, 'fuel': 178, 'signal': 'Lost', 'status': 'Suspicious stop', 'stop': 35, 'message': 'Stopped 35 minutes and fuel drops heavily.'},
+            {'area': 'Kericho', 'lat': -0.3677, 'lng': 35.2831, 'speed': 55, 'fuel': 176, 'signal': 'Online', 'status': 'Alert flagged', 'stop': 0, 'message': 'Truck returns online. System flags possible fuel theft.'},
+            {'area': 'Ahero', 'lat': -0.1746, 'lng': 34.9163, 'speed': 60, 'fuel': 171, 'signal': 'Online', 'status': 'Moving', 'stop': 0, 'message': 'Truck continues toward Kisumu.'},
+            {'area': 'Kisumu delivery point', 'lat': -0.0917, 'lng': 34.7680, 'speed': 0, 'fuel': 168, 'signal': 'Online', 'status': 'Arrived', 'stop': 0, 'message': 'Truck arrives in Kisumu.'}
+        ]
+    })
 
 
 @app.route('/incidents')

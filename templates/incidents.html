@@ -1,3 +1,4 @@
 {% extends 'base.html' %}{% block content %}
-<h1>Flagged Jamming / Fuel Gap Incidents</h1><p class="note">Thresholds: signal gap ≥ 10 minutes and fuel drop ≥ 15 litres.</p>{% include 'incident_table.html' %}
+<section class="hero compact-hero"><small>Forensic Alerts</small><h1>Flagged Stops / GSM Gaps / Fuel Loss</h1><p class="note">Thresholds: signal gap ≥ 10 minutes and fuel drop ≥ 15 litres. Demo tracking visually explains how these alerts happen.</p></section>
+{% include 'incident_table.html' %}
 {% endblock %}

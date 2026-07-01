@@ -1,4 +1,17 @@
 {% extends 'base.html' %}{% block content %}
-<h1>Vehicle and Driver Management</h1>
+<section class="hero compact-hero"><small>Truck Registry</small><h1>Add / Manage Trucks</h1><p>Add demo trucks now. Later, real GPS trucks can use the same plate and tracker ID.</p></section>
+
+<section class="form-card">
+  <h2>Add truck</h2>
+  <form method="post" class="truck-form">
+    <label>Plate number<input name="plate" placeholder="KDG 142A" required></label>
+    <label>Driver<input name="driver" placeholder="Driver name" required></label>
+    <label>Tracker model<input name="tracker_model" placeholder="Teltonika / Phone GPS" value="Phone GPS Demo"></label>
+    <label>Fuel sensor<input name="fuel_sensor" placeholder="Ultrasonic / Manual demo" value="Demo fuel sensor"></label>
+    <label>Status<select name="status"><option>online</option><option>alert</option><option>offline</option></select></label>
+    <button type="submit">Add Truck</button>
+  </form>
+</section>
+
 <table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td></tr>{% endfor %}</table>
 {% endblock %}
