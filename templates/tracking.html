@@ -1,24 +1,18 @@
 {% extends 'base.html' %}{% block content %}
-<section class="hero compact-hero"><small>Live Tracking Demo</small><h1>Nairobi → Kisumu Moving Truck</h1><p>Select a truck, press Start Demo, then watch it move, stop, lose signal, and trigger a fuel-theft alert.</p></section>
+<section class="page-header tracking-header">
+  <div>
+    <span class="eyebrow">Live Fleet Tracking</span>
+    <h1>Nairobi to Kisumu Route Monitor</h1>
+    <p>A professional map simulation showing route trails, vehicle movement, stop duration, signal loss, and fuel-drop risk.</p>
+  </div>
+</section>
 
 <section class="tracking-shell">
-  <div class="map-card">
-    <div id="map"></div>
-    <div class="route-demo-overlay">
-      <div class="route-line"></div>
-      <div class="city nairobi">Nairobi</div>
-      <div class="city naivasha">Naivasha</div>
-      <div class="city nakuru">Nakuru</div>
-      <div class="city kericho">Kericho</div>
-      <div class="city kisumu">Kisumu</div>
-      <div id="demoTruck" class="demo-truck">TRK</div>
-      <div id="dangerZone" class="danger-zone">GSM blackout / fuel loss zone</div>
-    </div>
-  </div>
+  <div class="map-card"><div id="map"></div></div>
   <aside class="telemetry-card">
-    <h2>Truck control</h2>
-    <label>Truck</label>
-    <select id="truckSelect"><option value="KDG 142A">KDG 142A — Demo</option><option value="KDB 502M">KDB 502M — Demo theft event</option></select>
+    <h2>Vehicle telemetry</h2>
+    <label>Vehicle registration</label>
+    <select id="truckSelect"><option value="KDG 142A">KDG 142A — Nairobi to Kisumu</option><option value="KDB 502M">KDB 502M — Theft event demo</option></select>
     <div class="button-row"><button id="startBtn">Start Demo</button><button id="pauseBtn">Pause</button><button id="resetBtn">Reset</button></div>
     <dl class="telemetry-grid">
       <dt>Route</dt><dd id="routeName">Nairobi to Kisumu</dd>
@@ -29,13 +23,13 @@
       <dt>Signal</dt><dd id="signal">Online</dd>
       <dt>Stopped time</dt><dd id="stopTime">0 min</dd>
     </dl>
-    <div id="alertBox" class="alert-box quiet">No alert. Start the demo.</div>
+    <div id="alertBox" class="alert-box quiet">No alert. Start the route simulation.</div>
   </aside>
 </section>
 
 <section class="timeline-card">
-  <h2>Demo story Kelvin can explain</h2>
-  <ol id="eventLog"><li>Truck is loaded in Nairobi and begins the Kisumu delivery route.</li></ol>
+  <h2>Route event log</h2>
+  <ol id="eventLog"><li>KDG 142A is loaded in Nairobi and assigned to the Kisumu delivery route.</li></ol>
 </section>
 {% endblock %}
 

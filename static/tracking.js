@@ -1,14 +1,20 @@
-let map, marker, routeLine, timer;
+let map, marker, routeLine, completedLine, timer;
 let index = 0;
 let points = [];
 let running = false;
 
-const truckIcon = L.divIcon({
-  className: 'truck-marker',
-  html: '<div class="truck-bubble">TRK</div>',
-  iconSize: [42, 42],
-  iconAnchor: [21, 21]
-});
+function selectedPlate() {
+  return document.getElementById('truckSelect')?.value || 'KDG 142A';
+}
+
+function truckIcon(plate) {
+  return L.divIcon({
+    className: 'truck-marker',
+    html: `<div class="truck-label"><span>${plate}</span></div>`,
+    iconSize: [92, 34],
+    iconAnchor: [46, 17]
+  });
+}
 
 function setText(id, value) {
   const el = document.getElementById(id);
@@ -30,28 +36,16 @@ function updatePanel(p) {
   setText('status', p.status);
   setText('stopTime', `${p.stop} min`);
 
-  const demoTruck = document.getElementById('demoTruck');
-  const dangerZone = document.getElementById('dangerZone');
-  const overlayPath = [
-    {x: 12, y: 72}, {x: 22, y: 61}, {x: 35, y: 51}, {x: 46, y: 46}, {x: 56, y: 41},
-    {x: 63, y: 34}, {x: 63, y: 34}, {x: 73, y: 44}, {x: 83, y: 52}, {x: 91, y: 60}
-  ];
-  if (demoTruck && overlayPath[index]) {
-    demoTruck.style.left = overlayPath[index].x + '%';
-    demoTruck.style.top = overlayPath[index].y + '%';
-  }
-  if (dangerZone) dangerZone.classList.toggle('active', p.signal === 'Lost' || p.stop >= 30 || p.status.includes('Alert'));
-
   const alertBox = document.getElementById('alertBox');
   if (p.signal === 'Lost' || p.stop >= 30 || p.status.includes('Alert')) {
     alertBox.className = 'alert-box hot';
-    alertBox.innerHTML = 'Possible theft: long stop + signal loss + fuel drop detected.';
+    alertBox.textContent = 'Risk alert: extended stop, signal loss, and major fuel drop detected.';
   } else if (p.stop > 0) {
     alertBox.className = 'alert-box warn';
-    alertBox.innerHTML = 'Truck is stopped. Timer running.';
+    alertBox.textContent = 'Vehicle stopped. Monitoring stop duration and fuel level.';
   } else {
     alertBox.className = 'alert-box quiet';
-    alertBox.innerHTML = 'Normal movement.';
+    alertBox.textContent = 'Vehicle moving normally. Signal and fuel levels are stable.';
   }
 }
 
@@ -59,8 +53,11 @@ function drawPoint(i) {
   if (!points.length) return;
   index = Math.max(0, Math.min(i, points.length - 1));
   const p = points[index];
-  marker.setLatLng([p.lat, p.lng]);
-  marker.bindPopup(`<strong>${document.getElementById('truckSelect').value}</strong><br>${p.area}<br>${p.status}`).openPopup();
+  const latlng = [p.lat, p.lng];
+  marker.setIcon(truckIcon(selectedPlate()));
+  marker.setLatLng(latlng);
+  marker.bindTooltip(`${selectedPlate()} · ${p.area}`, { permanent: false, direction: 'top' });
+  completedLine.setLatLngs(points.slice(0, index + 1).map(point => [point.lat, point.lng]));
   updatePanel(p);
   addLog(p.message);
 }
@@ -71,8 +68,33 @@ function step() {
   if (index >= points.length - 1) {
     running = false;
     clearInterval(timer);
-    addLog('Demo complete: Nairobi to Kisumu trip finished.');
+    addLog('Route complete: vehicle arrived at Kisumu delivery point.');
   }
+}
+
+function addOtherTrails() {
+  const trails = [
+    {
+      name: 'Nairobi to Mombasa corridor',
+      color: '#94a3b8',
+      pts: [[-1.286389,36.817223],[-1.5177,37.2634],[-2.2717,38.0126],[-3.3961,38.5561],[-4.0435,39.6682]]
+    },
+    {
+      name: 'Nairobi to Eldoret corridor',
+      color: '#64748b',
+      pts: [[-1.286389,36.817223],[-0.7167,36.4333],[-0.3031,36.0800],[0.5143,35.2698]]
+    },
+    {
+      name: 'Kisumu regional return route',
+      color: '#cbd5e1',
+      pts: [[-0.0917,34.7680],[-0.6773,34.7796],[-1.0634,34.4731]]
+    }
+  ];
+  trails.forEach(t => {
+    L.polyline(t.pts, { color: t.color, weight: 3, opacity: 0.65, dashArray: '6 8' })
+      .addTo(map)
+      .bindTooltip(t.name);
+  });
 }
 
 async function init() {
@@ -81,41 +103,56 @@ async function init() {
   points = data.points;
   setText('routeName', data.route);
 
-  map = L.map('map').setView([-0.76, 35.77], 8);
+  map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([-0.70, 35.82], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
+  addOtherTrails();
   const latlngs = points.map(p => [p.lat, p.lng]);
-  routeLine = L.polyline(latlngs, { color: '#2563eb', weight: 5, opacity: 0.85 }).addTo(map);
-  L.polyline(latlngs.slice(5, 7), { color: '#ef4444', weight: 8, opacity: 0.55 }).addTo(map);
-  marker = L.marker(latlngs[0], { icon: truckIcon }).addTo(map);
+  routeLine = L.polyline(latlngs, { color: '#020617', weight: 14, opacity: 0.95 }).addTo(map).bindTooltip('Assigned route: Nairobi to Kisumu');
+  completedLine = L.polyline([], { color: '#2563eb', weight: 8, opacity: 1 }).addTo(map);
+  L.polyline(latlngs.slice(5, 7), { color: '#dc2626', weight: 10, opacity: 0.95 }).addTo(map).bindTooltip('Risk segment: Mau Summit blackout');
+  points.forEach((p, n) => {
+    if ([0,3,4,5,7,9].includes(n)) {
+      L.circleMarker([p.lat, p.lng], { radius: 6, color: '#020617', weight: 2, fillColor: '#f8fafc', fillOpacity: 1 })
+        .addTo(map)
+        .bindTooltip(p.area, { permanent: n === 0 || n === 9, direction: 'top', offset: [0, -6] });
+    }
+  });
+  marker = L.marker(latlngs[0], { icon: truckIcon(selectedPlate()), zIndexOffset: 1000 }).addTo(map);
+
   setTimeout(() => {
-    map.invalidateSize();
-    map.setView([-0.70, 35.82], 7);
+    map.invalidateSize(true);
+    map.fitBounds(routeLine.getBounds(), { padding: [36, 36] });
     drawPoint(0);
   }, 250);
+  setTimeout(() => {
+    map.invalidateSize(true);
+    map.fitBounds(routeLine.getBounds(), { padding: [36, 36] });
+  }, 900);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
+  document.getElementById('truckSelect').addEventListener('change', () => drawPoint(index));
   document.getElementById('startBtn').addEventListener('click', () => {
     running = true;
     clearInterval(timer);
-    timer = setInterval(step, 1700);
-    addLog('Demo started. Watch the truck move on the route.');
+    timer = setInterval(step, 1500);
+    addLog('Route simulation started. Vehicle movement is now being monitored.');
   });
   document.getElementById('pauseBtn').addEventListener('click', () => {
     running = false;
     clearInterval(timer);
-    addLog('Demo paused.');
+    addLog('Route simulation paused.');
   });
   document.getElementById('resetBtn').addEventListener('click', () => {
     running = false;
     clearInterval(timer);
     index = 0;
-    document.getElementById('eventLog').innerHTML = '<li>Truck is loaded in Nairobi and begins the Kisumu delivery route.</li>';
+    document.getElementById('eventLog').innerHTML = '<li>KDG 142A is loaded in Nairobi and assigned to the Kisumu delivery route.</li>';
     drawPoint(0);
   });
 });
