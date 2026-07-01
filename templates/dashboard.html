@@ -1,5 +1,5 @@
 {% extends 'base.html' %}{% block content %}
-<div class="hero"><small>Military Fleet Telematics Command</small><h1>Live Fleet Monitoring Dashboard</h1><p>Truck-based GSM jamming detection, fuel-drop analysis, and forensic incident reporting.</p></div>
+<div class="hero"><small>Fleet Operations Dashboard</small><h1>Live Fleet Monitoring Dashboard</h1><p>Delivery-van monitoring, GSM signal-gap detection, fuel-drop analysis, and forensic incident reporting.</p></div>
 <section class="cards"><div><b>{{ stats.vehicles }}</b><span>Total Trucks</span></div><div><b>{{ stats.online }}</b><span>Online</span></div><div><b>{{ stats.alerts }}</b><span>Open Alerts</span></div><div><b>{{ '%.1f'|format(stats.fuel_loss) }} L</b><span>Suspected Loss</span></div></section>
 <h2>Recent Forensic Alerts</h2>{% include 'incident_table.html' %}
 <h2>Fleet Status</h2><div class="grid">{% for v in vehicles %}<div class="vehicle {{ v.status }}"><strong>{{ v.plate }}</strong><span>{{ v.driver }}</span><em>{{ v.status }}</em></div>{% endfor %}</div>
