@@ -1,4 +1,4 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fleet Jamming Detection</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
-<body><nav><div class="brand">FuelGuard Forensics</div><a href="/">Dashboard</a><a href="/vehicles">Vehicles</a><a href="/incidents">Incidents</a><a href="/scan">Run Scan</a></nav><main>{% block content %}{% endblock %}</main></body></html>
+<body><nav><div class="brand">FuelGuard Forensics</div>{% if session.get('user') %}<a href="/">Dashboard</a><a href="/vehicles">Vehicles</a><a href="/incidents">Incidents</a><a href="/scan">Run Scan</a><a href="/logout">Logout</a>{% else %}<a href="/login">Login</a>{% endif %}</nav><main>{% block content %}{% endblock %}</main></body></html>

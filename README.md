@@ -11,7 +11,12 @@ python app.py
 ```
 Open http://127.0.0.1:5000
 
+## Demo login
+- Username: `admin`
+- Password: `admin123`
+
 ## Pages
+- `/login` login screen
 - `/` dashboard
 - `/vehicles` vehicle/driver management
 - `/incidents` flagged incidents

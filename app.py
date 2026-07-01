@@ -1,4 +1,5 @@
-from flask import Flask, render_template, g, redirect, url_for, Response, send_file
+from flask import Flask, render_template, g, redirect, url_for, Response, send_file, request, session, flash
+from functools import wraps
 import sqlite3, os, csv, io
 from datetime import datetime, timedelta
 from reportlab.lib.pagesizes import A4
@@ -9,8 +10,37 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'fleet.db')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'demo-secret-key')
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 GAP_THRESHOLD_MINUTES = 10
 FUEL_DROP_THRESHOLD_LITRES = 15
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session.get('user'):
+            return redirect(url_for('login', next=request.path))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['user'] = username
+            return redirect(request.args.get('next') or url_for('dashboard'))
+        flash('Invalid username or password')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 
 def get_db():
@@ -88,6 +118,7 @@ def detect_incidents(conn=None):
 
 
 @app.route('/')
+@login_required
 def dashboard():
     conn = get_db()
     stats = {
@@ -102,17 +133,20 @@ def dashboard():
 
 
 @app.route('/vehicles')
+@login_required
 def vehicles():
     return render_template('vehicles.html', vehicles=get_db().execute('SELECT * FROM vehicles ORDER BY plate').fetchall())
 
 
 @app.route('/incidents')
+@login_required
 def incidents():
     rows = get_db().execute('SELECT incidents.*, vehicles.plate, vehicles.driver FROM incidents JOIN vehicles ON vehicles.id=incidents.vehicle_id ORDER BY incidents.id DESC').fetchall()
     return render_template('incidents.html', incidents=rows)
 
 
 @app.route('/scan')
+@login_required
 def scan():
     detect_incidents()
     return redirect(url_for('incidents'))
@@ -123,6 +157,7 @@ def incident_row(incident_id):
 
 
 @app.route('/reports/<int:incident_id>.csv')
+@login_required
 def report_csv(incident_id):
     row = incident_row(incident_id)
     if not row:
@@ -135,6 +170,7 @@ def report_csv(incident_id):
 
 
 @app.route('/reports/<int:incident_id>.pdf')
+@login_required
 def report_pdf(incident_id):
     row = incident_row(incident_id)
     if not row:
