@@ -10,9 +10,12 @@ function selectedPlate() {
 function truckIcon(plate) {
   return L.divIcon({
     className: 'truck-marker',
-    html: `<div class="truck-label"><span>${plate}</span></div>`,
-    iconSize: [92, 34],
-    iconAnchor: [46, 17]
+    html: `<div class="vehicle-marker">
+      <div class="vehicle-body"><span class="vehicle-cab"></span><span class="vehicle-load"></span></div>
+      <div class="vehicle-plate">${plate}</div>
+    </div>`,
+    iconSize: [104, 54],
+    iconAnchor: [52, 27]
   });
 }
 
@@ -49,6 +52,22 @@ function updatePanel(p) {
   }
 }
 
+function updateOverlayVehicle(i) {
+  const coords = [
+    [16, 76], [22, 66], [31, 56], [39, 49], [48, 42],
+    [56, 37], [62, 35], [69, 35], [77, 31], [84, 26]
+  ];
+  const vehicle = document.getElementById('overlayVehicle');
+  const progress = document.getElementById('overlayProgress');
+  if (!vehicle || !progress) return;
+  const pos = coords[Math.max(0, Math.min(i, coords.length - 1))];
+  vehicle.style.left = `${pos[0]}%`;
+  vehicle.style.top = `${pos[1]}%`;
+  vehicle.querySelector('strong').textContent = selectedPlate();
+  const pct = i / (coords.length - 1);
+  progress.style.strokeDashoffset = String(260 - (260 * pct));
+}
+
 function drawPoint(i) {
   if (!points.length) return;
   index = Math.max(0, Math.min(i, points.length - 1));
@@ -58,6 +77,7 @@ function drawPoint(i) {
   marker.setLatLng(latlng);
   marker.bindTooltip(`${selectedPlate()} · ${p.area}`, { permanent: false, direction: 'top' });
   completedLine.setLatLngs(points.slice(0, index + 1).map(point => [point.lat, point.lng]));
+  updateOverlayVehicle(index);
   updatePanel(p);
   addLog(p.message);
 }
@@ -104,9 +124,9 @@ async function init() {
   setText('routeName', data.route);
 
   map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([-0.70, 35.82], 7);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16,
+    attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, HERE, Garmin, OpenStreetMap contributors'
   }).addTo(map);
 
   addOtherTrails();
@@ -155,4 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('eventLog').innerHTML = '<li>KDG 142A is loaded in Nairobi and assigned to the Kisumu delivery route.</li>';
     drawPoint(0);
   });
+
+  setTimeout(() => {
+    if (!running && index === 0) {
+      document.getElementById('startBtn').click();
+    }
+  }, 1200);
 });

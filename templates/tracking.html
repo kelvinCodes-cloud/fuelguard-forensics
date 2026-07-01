@@ -8,7 +8,26 @@
 </section>
 
 <section class="tracking-shell">
-  <div class="map-card"><div id="map"></div></div>
+  <div class="map-card">
+    <div id="map"></div>
+    <div class="simulation-layer" aria-hidden="true">
+      <svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path class="secondary-route" d="M18 78 C 30 70, 43 66, 56 58 S 78 42, 92 30" />
+        <path class="secondary-route alt" d="M12 42 C 26 45, 38 38, 48 30 S 67 20, 82 14" />
+        <path class="secondary-route" d="M76 76 C 68 66, 60 59, 52 52 S 37 40, 28 28" />
+        <path class="main-route-shadow" d="M16 76 C 23 67, 28 57, 36 50 S 51 39, 59 35 S 72 35, 84 26" />
+        <path id="overlayProgress" class="main-route-progress" d="M16 76 C 23 67, 28 57, 36 50 S 51 39, 59 35 S 72 35, 84 26" />
+        <path class="risk-route" d="M56 37 C 59 35, 62 34, 65 34" />
+      </svg>
+      <span class="map-city city-nairobi">Nairobi</span>
+      <span class="map-city city-nakuru">Nakuru</span>
+      <span class="map-city city-kisumu">Kisumu</span>
+      <div id="overlayVehicle" class="overlay-vehicle">
+        <span class="mini-truck"></span>
+        <strong>KDG 142A</strong>
+      </div>
+    </div>
+  </div>
   <aside class="telemetry-card">
     <h2>Vehicle telemetry</h2>
     <label>Vehicle registration</label>
@@ -34,5 +53,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='tracking.js') }}"></script>
+<script src="{{ url_for('static', filename='tracking.js') }}?v=simulation-vehicle-2"></script>
 {% endblock %}
