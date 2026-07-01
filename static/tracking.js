@@ -5,7 +5,7 @@ let running = false;
 
 const truckIcon = L.divIcon({
   className: 'truck-marker',
-  html: '<div class="truck-bubble">🚚</div>',
+  html: '<div class="truck-bubble">TRK</div>',
   iconSize: [42, 42],
   iconAnchor: [21, 21]
 });
@@ -45,13 +45,13 @@ function updatePanel(p) {
   const alertBox = document.getElementById('alertBox');
   if (p.signal === 'Lost' || p.stop >= 30 || p.status.includes('Alert')) {
     alertBox.className = 'alert-box hot';
-    alertBox.innerHTML = '🚨 Possible theft: long stop + signal loss + fuel drop detected.';
+    alertBox.innerHTML = 'Possible theft: long stop + signal loss + fuel drop detected.';
   } else if (p.stop > 0) {
     alertBox.className = 'alert-box warn';
-    alertBox.innerHTML = '⚠ Truck is stopped. Timer running.';
+    alertBox.innerHTML = 'Truck is stopped. Timer running.';
   } else {
     alertBox.className = 'alert-box quiet';
-    alertBox.innerHTML = '✅ Normal movement.';
+    alertBox.innerHTML = 'Normal movement.';
   }
 }
 

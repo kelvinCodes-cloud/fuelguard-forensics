@@ -1,21 +1,23 @@
 {% extends 'base.html' %}{% block content %}
-<section class="hero compact-hero">
-  <small>Fleet Simulation Dashboard</small>
-  <h1>FuelGuard Live Demo</h1>
-  <p>The middle stays clean. Use the left icons to open tracking, add trucks, view alerts, or export reports.</p>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Operations Dashboard</span>
+    <h1>Fleet Monitoring & Fuel-Theft Detection</h1>
+    <p>Monitor delivery trucks, review suspicious stops, and generate forensic incident reports.</p>
+  </div>
+  <a class="primary-action" href="/tracking">Open Live Tracking</a>
 </section>
 
-<section class="cards icon-cards">
-  <a class="action-card" href="/tracking"><b>🗺️</b><strong>Track demo truck</strong><span>Animated Nairobi → Kisumu trip</span></a>
-  <a class="action-card" href="/vehicles"><b>➕</b><strong>Add trucks</strong><span>Create demo or future real trucks</span></a>
-  <a class="action-card" href="/incidents"><b>🚨</b><strong>Incidents</strong><span>Stops, signal loss, fuel drops</span></a>
-  <a class="action-card" href="/scan"><b>🔍</b><strong>Run scan</strong><span>Recalculate suspicious events</span></a>
+<section class="stats-grid">
+  <div class="stat-card"><span>Total Trucks</span><strong>{{ stats.vehicles }}</strong></div>
+  <div class="stat-card"><span>Online</span><strong>{{ stats.online }}</strong></div>
+  <div class="stat-card"><span>Open Alerts</span><strong>{{ stats.alerts }}</strong></div>
+  <div class="stat-card"><span>Suspected Loss</span><strong>{{ '%.1f'|format(stats.fuel_loss) }} L</strong></div>
 </section>
 
-<section class="cards stats-strip">
-  <div><b>{{ stats.vehicles }}</b><span>Total Trucks</span></div>
-  <div><b>{{ stats.online }}</b><span>Online</span></div>
-  <div><b>{{ stats.alerts }}</b><span>Open Alerts</span></div>
-  <div><b>{{ '%.1f'|format(stats.fuel_loss) }} L</b><span>Suspected Loss</span></div>
+<section class="dashboard-grid">
+  <a class="module-card" href="/tracking"><span>Live Tracking</span><strong>Nairobi to Kisumu demo route</strong><p>View moving truck simulation, stopped time, signal loss, and fuel drop alerts.</p></a>
+  <a class="module-card" href="/vehicles"><span>Truck Registry</span><strong>Add and manage trucks</strong><p>Register demo trucks now and prepare the system for real GPS units later.</p></a>
+  <a class="module-card" href="/incidents"><span>Forensics</span><strong>Incident reports</strong><p>Review flagged GSM blackout and fuel-loss events, then export evidence reports.</p></a>
 </section>
 {% endblock %}
