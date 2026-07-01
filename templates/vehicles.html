@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Vehicle and Driver Management</h1>
+<table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td></tr>{% endfor %}</table>
+{% endblock %}
