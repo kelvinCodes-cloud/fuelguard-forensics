@@ -1,18 +1,22 @@
 {% extends 'base.html' %}{% block content %}
-<section class="login-card">
+<section class="login-card strong-login">
   <div class="login-copy">
     <small>Secure Fleet Access</small>
     <h1>Login to FuelGuard</h1>
-    <p>Access the fleet dashboard, jamming alerts, and forensic reports.</p>
+    <p>Access the fleet dashboard, live tracking, jamming alerts, and forensic reports.</p>
+    <ul class="login-notes">
+      <li>Username and password are required.</li>
+      <li>Default demo password is stronger for presentation.</li>
+    </ul>
   </div>
   <form method="post" class="login-form">
     {% with messages = get_flashed_messages() %}{% if messages %}<div class="error">{{ messages[0] }}</div>{% endif %}{% endwith %}
     <label>Username</label>
-    <input name="username" type="text" autocomplete="username" required autofocus>
+    <input name="username" type="text" autocomplete="username" minlength="3" placeholder="Enter username" required autofocus>
     <label>Password</label>
-    <input name="password" type="password" autocomplete="current-password" required>
+    <input name="password" type="password" autocomplete="current-password" minlength="8" placeholder="Enter password" required>
     <button type="submit">Login</button>
-    <p class="demo-hint">Demo: <strong>admin</strong> / <strong>admin123</strong></p>
+    <p class="demo-hint">Demo: <strong>admin</strong> / <strong>FuelGuard@2026</strong></p>
   </form>
 </section>
 {% endblock %}

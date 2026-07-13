@@ -3,21 +3,55 @@
   <div>
     <span class="eyebrow">Operations Dashboard</span>
     <h1>Fleet Monitoring & Fuel-Theft Detection</h1>
-    <p>Monitor delivery trucks, review suspicious stops, and generate forensic incident reports.</p>
+    <p>Monitor trucks, online status, open alerts, suspected fuel loss, and forensic case evidence.</p>
   </div>
   <a class="primary-action" href="/tracking">Open Live Tracking</a>
 </section>
 
 <section class="stats-grid">
-  <div class="stat-card"><span>Total Trucks</span><strong>{{ stats.vehicles }}</strong></div>
+  <div class="stat-card"><span>Trucks</span><strong>{{ stats.vehicles }}</strong></div>
   <div class="stat-card"><span>Online</span><strong>{{ stats.online }}</strong></div>
   <div class="stat-card"><span>Open Alerts</span><strong>{{ stats.alerts }}</strong></div>
   <div class="stat-card"><span>Suspected Loss</span><strong>{{ '%.1f'|format(stats.fuel_loss) }} L</strong></div>
 </section>
 
 <section class="dashboard-grid">
-  <a class="module-card" href="/tracking"><span>Live Tracking</span><strong>Nairobi to Kisumu demo route</strong><p>View moving truck simulation, stopped time, signal loss, and fuel drop alerts.</p></a>
-  <a class="module-card" href="/vehicles"><span>Truck Registry</span><strong>Add and manage trucks</strong><p>Register demo trucks now and prepare the system for real GPS units later.</p></a>
-  <a class="module-card" href="/incidents"><span>Forensics</span><strong>Incident reports</strong><p>Review flagged GSM blackout and fuel-loss events, then export evidence reports.</p></a>
+  <a class="module-card" href="/tracking"><span>Live Tracking</span><strong>Nairobi to Kisumu demo route</strong><p>Watch truck movement, stopped time, signal loss, and fuel drop alerts.</p></a>
+  <a class="module-card" href="/vehicles"><span>Truck Registry</span><strong>Add / remove trucks</strong><p>Choose tracker model, fuel sensor, and status. Remove a driver or truck after a mistaken alert.</p></a>
+  <a class="module-card" href="/incidents"><span>Forensics</span><strong>Incident reports</strong><p>Review GSM blackout and fuel-loss events, resolve false alerts, then export evidence reports.</p></a>
+</section>
+
+<section class="dashboard-grid explain-grid">
+  <div class="module-card info-card">
+    <span>Tracker vs Fuel Sensor</span>
+    <strong>They are different devices working together.</strong>
+    <p><b>Tracker:</b> the Teltonika GPS/GSM unit. It sends location, speed, time, and online/offline signal.</p>
+    <p><b>Fuel sensor:</b> the tank measuring device. It sends fuel level changes in litres.</p>
+    <p><b>Forensics:</b> the alert becomes suspicious when tracker signal disappears and fuel level drops before the truck comes back online.</p>
+  </div>
+  <div class="module-card info-card">
+    <span>Hardware note</span>
+    <strong>Teltonika can handle this setup.</strong>
+    <p>Use a Teltonika tracker for GPS/GSM data, then connect a supported fuel sensor through the device input/RS232/RS485 depending on the model.</p>
+    <p>This demo keeps both fields separate so the project explanation is clear during defence.</p>
+  </div>
+  <div class="module-card info-card">
+    <span>Status meaning</span>
+    <strong>Active · Online · Offline</strong>
+    <p><b>Active:</b> truck is registered and allowed in the system.</p>
+    <p><b>Online:</b> tracker is currently reporting data.</p>
+    <p><b>Offline:</b> tracker has stopped reporting or signal is lost.</p>
+  </div>
+</section>
+
+<section class="dashboard-grid">
+  <div class="module-card wide-card">
+    <span>Current Trucks</span>
+    <table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td></tr>{% endfor %}</table>
+  </div>
+  <div class="module-card wide-card">
+    <span>Recent Alerts</span>
+    {% include 'incident_table.html' %}
+  </div>
 </section>
 {% endblock %}

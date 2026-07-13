@@ -11,7 +11,7 @@ DB_PATH = os.path.join(BASE_DIR, 'fleet.db')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'demo-secret-key')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'FuelGuard@2026')
 GAP_THRESHOLD_MINUTES = 10
 FUEL_DROP_THRESHOLD_LITRES = 15
 
@@ -68,17 +68,29 @@ def init_db():
     conn.commit()
     if cur.execute('SELECT COUNT(*) FROM vehicles').fetchone()[0] == 0:
         seed(conn)
+    else:
+        normalize_demo_data(conn)
     conn.close()
+
+
+def normalize_demo_data(conn):
+    cur = conn.cursor()
+    cur.execute("UPDATE vehicles SET status='online' WHERE status='alert'")
+    cur.execute("UPDATE vehicles SET tracker_model='Teltonika FMB920' WHERE tracker_model IN ('Teltonika FMx920','Phone GPS Demo','')")
+    cur.execute("UPDATE vehicles SET fuel_sensor='Ultrasonic fuel sensor' WHERE fuel_sensor IN ('TA34 Ultrasonic','Demo fuel sensor','')")
+    cur.execute("INSERT OR IGNORE INTO vehicles(plate,driver,tracker_model,fuel_sensor,status) VALUES (?,?,?,?,?)", ('KDJ 904T', 'Amina Wanjiru', 'Teltonika FMC130', 'Digital fuel probe via RS485', 'active'))
+    conn.commit()
 
 
 def seed(conn):
     cur = conn.cursor()
     vehicles = [
-        ('KDG 142A', 'Peter Mwangi', 'Teltonika FMx920', 'TA34 Ultrasonic', 'online'),
-        ('KDE 811K', 'Samuel Otieno', 'Teltonika FMx920', 'TA34 Ultrasonic', 'online'),
-        ('KDB 502M', 'Brian Karanja', 'Teltonika FMx920', 'TA34 Ultrasonic', 'alert'),
-        ('KDF 771R', 'Joseph Njoroge', 'Teltonika FMx920', 'TA34 Ultrasonic', 'offline'),
-        ('KDC 330P', 'David Wekesa', 'Teltonika FMx920', 'TA34 Ultrasonic', 'online'),
+        ('KDG 142A', 'Peter Mwangi', 'Teltonika FMB920', 'Ultrasonic fuel sensor', 'online'),
+        ('KDE 811K', 'Samuel Otieno', 'Teltonika FMC130', 'Capacitive fuel sensor', 'online'),
+        ('KDB 502M', 'Brian Karanja', 'Teltonika FMB125', 'Digital fuel probe via RS485', 'online'),
+        ('KDF 771R', 'Joseph Njoroge', 'Teltonika FMC650', 'Ultrasonic fuel sensor', 'offline'),
+        ('KDC 330P', 'David Wekesa', 'Teltonika FMB920', 'Capacitive fuel sensor', 'online'),
+        ('KDJ 904T', 'Amina Wanjiru', 'Teltonika FMC130', 'Digital fuel probe via RS485', 'active'),
     ]
     cur.executemany('INSERT INTO vehicles(plate,driver,tracker_model,fuel_sensor,status) VALUES (?,?,?,?,?)', vehicles)
     base = datetime(2026, 7, 1, 8, 0, 0)
@@ -125,7 +137,9 @@ def dashboard():
         'vehicles': conn.execute('SELECT COUNT(*) FROM vehicles').fetchone()[0],
         'online': conn.execute("SELECT COUNT(*) FROM vehicles WHERE status='online'").fetchone()[0],
         'alerts': conn.execute("SELECT COUNT(*) FROM incidents WHERE status='open'").fetchone()[0],
-        'fuel_loss': conn.execute('SELECT COALESCE(SUM(fuel_drop),0) FROM incidents').fetchone()[0],
+        'fuel_loss': conn.execute("SELECT COALESCE(SUM(fuel_drop),0) FROM incidents WHERE status='open'").fetchone()[0],
+        'active': conn.execute("SELECT COUNT(*) FROM vehicles WHERE status IN ('active','online')").fetchone()[0],
+        'offline': conn.execute("SELECT COUNT(*) FROM vehicles WHERE status='offline'").fetchone()[0],
     }
     vehicles = conn.execute('SELECT * FROM vehicles ORDER BY plate').fetchall()
     incidents = conn.execute('SELECT incidents.*, vehicles.plate, vehicles.driver FROM incidents JOIN vehicles ON vehicles.id=incidents.vehicle_id ORDER BY incidents.id DESC LIMIT 5').fetchall()
@@ -139,14 +153,40 @@ def vehicles():
     if request.method == 'POST':
         plate = request.form.get('plate', '').strip().upper()
         driver = request.form.get('driver', '').strip()
-        tracker_model = request.form.get('tracker_model', '').strip() or 'Phone GPS Demo'
-        fuel_sensor = request.form.get('fuel_sensor', '').strip() or 'Demo fuel sensor'
-        status = request.form.get('status', 'online').strip().lower()
+        tracker_model = request.form.get('tracker_model', '').strip()
+        fuel_sensor = request.form.get('fuel_sensor', '').strip()
+        status = request.form.get('status', 'active').strip().lower()
         if plate and driver:
             conn.execute('INSERT OR IGNORE INTO vehicles(plate,driver,tracker_model,fuel_sensor,status) VALUES (?,?,?,?,?)', (plate, driver, tracker_model, fuel_sensor, status))
             conn.commit()
         return redirect(url_for('vehicles'))
     return render_template('vehicles.html', vehicles=conn.execute('SELECT * FROM vehicles ORDER BY plate').fetchall())
+
+
+@app.route('/vehicles/<int:vehicle_id>/remove', methods=['POST'])
+@login_required
+def remove_vehicle(vehicle_id):
+    conn = get_db()
+    row = conn.execute('SELECT plate, driver FROM vehicles WHERE id=?', (vehicle_id,)).fetchone()
+    if not row:
+        flash('Truck not found.')
+        return redirect(url_for('vehicles'))
+    conn.execute('DELETE FROM incidents WHERE vehicle_id=?', (vehicle_id,))
+    conn.execute('DELETE FROM telemetry WHERE vehicle_id=?', (vehicle_id,))
+    conn.execute('DELETE FROM vehicles WHERE id=?', (vehicle_id,))
+    conn.commit()
+    flash(f"Removed {row['driver']} / {row['plate']} from the dashboard and registry.")
+    return redirect(url_for('vehicles'))
+
+
+@app.route('/incidents/<int:incident_id>/resolve', methods=['POST'])
+@login_required
+def resolve_incident(incident_id):
+    conn = get_db()
+    conn.execute("UPDATE incidents SET status='resolved' WHERE id=?", (incident_id,))
+    conn.commit()
+    flash('Alert resolved and removed from open dashboard count.')
+    return redirect(url_for('incidents'))
 
 
 @app.route('/tracking')

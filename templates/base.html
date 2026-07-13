@@ -17,8 +17,8 @@
       <nav class="main-nav">
         <a href="/">Dashboard</a>
         <a href="/tracking">Live Tracking</a>
-        <a href="/vehicles">Trucks</a>
-        <a href="/incidents">Incidents</a>
+        <a href="/vehicles">Truck Registry</a>
+        <a href="/incidents">Forensics</a>
         <a href="/scan">Run Scan</a>
       </nav>
       <a class="logout-link" href="/logout">Logout</a>
@@ -26,7 +26,10 @@
       <nav class="main-nav"><a href="/login">Login</a></nav>
     {% endif %}
   </header>
-  <main class="screen-panel">{% block content %}{% endblock %}</main>
+  <main class="screen-panel">
+    {% with messages = get_flashed_messages() %}{% if messages %}<div class="flash-banner">{{ messages[0] }}</div>{% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   {% block scripts %}{% endblock %}
 </body>

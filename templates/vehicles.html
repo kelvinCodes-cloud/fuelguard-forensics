@@ -1,17 +1,40 @@
 {% extends 'base.html' %}{% block content %}
-<section class="hero compact-hero"><small>Truck Registry</small><h1>Add / Manage Trucks</h1><p>Add demo trucks now. Later, real GPS trucks can use the same plate and tracker ID.</p></section>
+<section class="hero compact-hero"><small>Truck Registry</small><h1>Add / Manage Trucks</h1><p>Add trucks with real-looking hardware choices. If an alert was a misunderstanding, remove the truck/driver from the dashboard here.</p></section>
 
 <section class="form-card">
   <h2>Add truck</h2>
   <form method="post" class="truck-form">
     <label>Plate number<input name="plate" placeholder="KDG 142A" required></label>
     <label>Driver<input name="driver" placeholder="Driver name" required></label>
-    <label>Tracker model<input name="tracker_model" placeholder="Teltonika / Phone GPS" value="Phone GPS Demo"></label>
-    <label>Fuel sensor<input name="fuel_sensor" placeholder="Ultrasonic / Manual demo" value="Demo fuel sensor"></label>
-    <label>Status<select name="status"><option>online</option><option>alert</option><option>offline</option></select></label>
+    <label>Tracker model
+      <select name="tracker_model" required>
+        <option value="" disabled selected>Select tracker model</option>
+        <option>Teltonika FMB920</option>
+        <option>Teltonika FMC130</option>
+        <option>Teltonika FMB125</option>
+        <option>Teltonika FMC650</option>
+      </select>
+    </label>
+    <label>Fuel sensor
+      <select name="fuel_sensor" required>
+        <option value="" disabled selected>Select fuel sensor</option>
+        <option>Ultrasonic fuel sensor</option>
+        <option>Capacitive fuel sensor</option>
+        <option>Resistive fuel sender</option>
+        <option>Digital fuel probe via RS485</option>
+      </select>
+    </label>
+    <label>Status<select name="status"><option value="active">Active</option><option value="online">Online</option><option value="offline">Offline</option></select></label>
     <button type="submit">Add Truck</button>
   </form>
 </section>
 
-<table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td></tr>{% endfor %}</table>
+<section class="form-card explanation-block">
+  <h2>How to explain tracker and fuel sensor</h2>
+  <p><b>Tracker:</b> The Teltonika unit is the communication and location device. It tells the dashboard where the truck is, whether it is moving, and whether it is online or offline.</p>
+  <p><b>Fuel sensor:</b> The fuel sensor is mounted on/in the tank and measures fuel level. It tells the system how many litres are available and whether a sudden drop happened.</p>
+  <p><b>Together:</b> If the tracker goes offline and the fuel sensor shows a large drop before the truck returns online, the system flags a possible fuel theft event for forensic review.</p>
+</section>
+
+<table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th><th>Action</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td><td><form method="post" action="/vehicles/{{ v.id }}/remove" onsubmit="return confirm('Remove this driver/truck from the dashboard?');"><button class="danger-button" type="submit">Remove</button></form></td></tr>{% endfor %}</table>
 {% endblock %}
