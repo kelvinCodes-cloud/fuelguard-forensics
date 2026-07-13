@@ -1,5 +1,5 @@
 {% extends 'base.html' %}{% block content %}
-<section class="hero compact-hero"><small>Truck Registry</small><h1>Add / Manage Trucks</h1><p>Add trucks with real-looking hardware choices. If an alert was a misunderstanding, remove the truck/driver from the dashboard here.</p></section>
+<section class="hero compact-hero"><small>Truck Registry</small><h1>Add / Manage Trucks</h1><p>Maintain fleet records, device details, and operating status.</p></section>
 
 <section class="form-card">
   <h2>Add truck</h2>
@@ -27,13 +27,6 @@
     <label>Status<select name="status"><option value="active">Active</option><option value="online">Online</option><option value="offline">Offline</option></select></label>
     <button type="submit">Add Truck</button>
   </form>
-</section>
-
-<section class="form-card explanation-block">
-  <h2>How to explain tracker and fuel sensor</h2>
-  <p><b>Tracker:</b> The Teltonika unit is the communication and location device. It tells the dashboard where the truck is, whether it is moving, and whether it is online or offline.</p>
-  <p><b>Fuel sensor:</b> The fuel sensor is mounted on/in the tank and measures fuel level. It tells the system how many litres are available and whether a sudden drop happened.</p>
-  <p><b>Together:</b> If the tracker goes offline and the fuel sensor shows a large drop before the truck returns online, the system flags a possible fuel theft event for forensic review.</p>
 </section>
 
 <table><tr><th>Plate</th><th>Driver</th><th>Tracker</th><th>Fuel Sensor</th><th>Status</th><th>Action</th></tr>{% for v in vehicles %}<tr><td>{{ v.plate }}</td><td>{{ v.driver }}</td><td>{{ v.tracker_model }}</td><td>{{ v.fuel_sensor }}</td><td><span class="pill {{ v.status }}">{{ v.status }}</span></td><td><form method="post" action="/vehicles/{{ v.id }}/remove" onsubmit="return confirm('Remove this driver/truck from the dashboard?');"><button class="danger-button" type="submit">Remove</button></form></td></tr>{% endfor %}</table>

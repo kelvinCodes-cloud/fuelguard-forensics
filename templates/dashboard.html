@@ -3,7 +3,7 @@
   <div>
     <span class="eyebrow">Operations Dashboard</span>
     <h1>Fleet Monitoring & Fuel-Theft Detection</h1>
-    <p>Monitor trucks, online status, open alerts, suspected fuel loss, and forensic case evidence.</p>
+    <p>Monitor trucks, live status, open alerts, suspected fuel loss, and forensic case evidence.</p>
   </div>
   <a class="primary-action" href="/tracking">Open Live Tracking</a>
 </section>
@@ -16,32 +16,9 @@
 </section>
 
 <section class="dashboard-grid">
-  <a class="module-card" href="/tracking"><span>Live Tracking</span><strong>Nairobi to Kisumu demo route</strong><p>Watch truck movement, stopped time, signal loss, and fuel drop alerts.</p></a>
-  <a class="module-card" href="/vehicles"><span>Truck Registry</span><strong>Add / remove trucks</strong><p>Choose tracker model, fuel sensor, and status. Remove a driver or truck after a mistaken alert.</p></a>
-  <a class="module-card" href="/incidents"><span>Forensics</span><strong>Incident reports</strong><p>Review GSM blackout and fuel-loss events, resolve false alerts, then export evidence reports.</p></a>
-</section>
-
-<section class="dashboard-grid explain-grid">
-  <div class="module-card info-card">
-    <span>Tracker vs Fuel Sensor</span>
-    <strong>They are different devices working together.</strong>
-    <p><b>Tracker:</b> the Teltonika GPS/GSM unit. It sends location, speed, time, and online/offline signal.</p>
-    <p><b>Fuel sensor:</b> the tank measuring device. It sends fuel level changes in litres.</p>
-    <p><b>Forensics:</b> the alert becomes suspicious when tracker signal disappears and fuel level drops before the truck comes back online.</p>
-  </div>
-  <div class="module-card info-card">
-    <span>Hardware note</span>
-    <strong>Teltonika can handle this setup.</strong>
-    <p>Use a Teltonika tracker for GPS/GSM data, then connect a supported fuel sensor through the device input/RS232/RS485 depending on the model.</p>
-    <p>This demo keeps both fields separate so the project explanation is clear during defence.</p>
-  </div>
-  <div class="module-card info-card">
-    <span>Status meaning</span>
-    <strong>Active · Online · Offline</strong>
-    <p><b>Active:</b> truck is registered and allowed in the system.</p>
-    <p><b>Online:</b> tracker is currently reporting data.</p>
-    <p><b>Offline:</b> tracker has stopped reporting or signal is lost.</p>
-  </div>
+  <a class="module-card" href="/tracking"><span>Live Tracking</span><strong>Nairobi to Kisumu route</strong><p>View movement, stops, signal loss, and fuel-drop events.</p></a>
+  <a class="module-card" href="/vehicles"><span>Truck Registry</span><strong>Fleet devices and status</strong><p>Manage trucks, tracker model, fuel sensor, and operating status.</p></a>
+  <a class="module-card" href="/incidents"><span>Forensics</span><strong>Incident reports</strong><p>Review flagged events, resolve false alerts, and export evidence reports.</p></a>
 </section>
 
 <section class="dashboard-grid">
