@@ -13,7 +13,7 @@ Open http://127.0.0.1:5000
 
 ## Demo login
 - Username: `admin`
-- Password: `admin123`
+- Password: `FuelGuard@2026
 
 ## Pages
 - `/login` login screen
